@@ -8,6 +8,8 @@
 - 使用TTS（Text-to-Speech）技术生成语音解说
 - 将图片和语音合成视频
 
+https://github.com/user-attachments/assets/b7e5ef8c-d979-4ba4-9b3e-d6a6adadcd1e
+
 ## 功能模块
 ### 1. 数据获取与处理
 - **utils/data.py**：提供`get_stock_data`函数用于从东方财富网获取股票历史数据；`calc_indicators`函数计算各种技术指标如均线、布林带、MACD等。

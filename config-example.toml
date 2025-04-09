@@ -1,0 +1,45 @@
+[llm]
+base_url = "http://localhost:8082/v1/"
+api_key = "xxxxxxxxxxxxxxxxxxxxxxx"
+model = "deepseek-r1-search"
+
+hy_user = "xxxxxxxx"
+agent_id = "xxxxxxxxx"
+chat_id = ""
+should_remove_conversation = false
+
+[tts]
+source = "dashscope"
+
+[tts.dashscope]
+api_key = "sk-e1xxxxxxxxxxxxxxx"
+model = "cosyvoice-v2"
+voices = ["loongbella_v2", "longcheng_v2"]
+
+[tts.edge]
+voices = ["zh-CN-XiaoyiNeural", "zh-CN-YunyangNeural"]
+
+[tts.hailuo]
+api_key = "xxxxxxxxxxxxxxx"
+base_url = "http://127.0.0.1:8080/v1"
+voices = ["Podcast_girl", "male-botong"]
+
+[js]
+js_host = "/home/video/assets/v5/"
+
+[video]
+fps = 24
+background_audio = "./assets/audio/bgm.mp3"
+width = 1080
+height = 1920
+
+[video.subtitle]
+font = "./assets/fonts/msyhbd.ttc"
+width_ratio = 0.8
+font_size_ratio = 18
+position_ratio = 0.88
+color = "white"
+stroke_color = "black"
+stroke_width = 2
+text_align = "center"
+interval = 0.2

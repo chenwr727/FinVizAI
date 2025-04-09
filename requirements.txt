@@ -1,0 +1,10 @@
+loguru==0.7.3
+moviepy==2.1.2
+openai==1.71.0
+pandas==2.2.3
+pydantic==2.11.2
+pyecharts==2.0.8
+pyppeteer==2.0.0
+Requests==2.32.3
+toml==0.10.2
+tqdm==4.67.1

@@ -54,12 +54,18 @@ class SubtitleConfig(BaseModel):
     interval: float = 0.2
 
 
+class TitleConfig(SubtitleConfig):
+    pass
+
+
 class VideoConfig(BaseModel):
     fps: int
     background_audio: str
+    background_audio_volume: float = 0.2
     width: int
     height: int
     subtitle: SubtitleConfig
+    title: TitleConfig
 
 
 class Config(BaseModel):

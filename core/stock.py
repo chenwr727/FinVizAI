@@ -30,6 +30,7 @@ class StockVideo:
             adjust=self.stock.adjust,
             period=self.stock.period,
         )
+        df = calc_indicators(df)
         self.output_dir = os.path.join(self.output_dir, self.stock.symbol, self.stock.period)
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
@@ -57,19 +58,17 @@ class StockVideo:
 
     async def generate_video(self, stock: StockBase, tts_config: TTSConfig, video_config: VideoConfig):
         logger.info(f"Start processing stock: {stock.symbol} {stock.period}")
-        df_base = self.get_hist_data(stock)
-
-        logger.info(f"Calculating indicators for stock: {stock.symbol} {stock.period}")
-        df = calc_indicators(df_base)
+        df = self.get_hist_data(stock)
 
         logger.info(f"Analyzing stock: {stock.symbol} {stock.period}")
         response = self.llm_analysis(df)
         contents = self._format_text(response.text)
+        title = contents.pop(0)
 
         logger.info(f"Drawing kline for stock: {stock.symbol} {stock.period}")
         output_image_folder = os.path.join(self.output_dir, "images")
         self._clean_output_dir(output_image_folder)
-        image_files = await draw_kline(self.stock.name, df_base, output_image_folder)
+        image_files = await draw_kline(self.stock.name, df, output_image_folder)
 
         logger.info(f"Generating audio for stock: {stock.symbol} {stock.period}")
         output_audio_folder = os.path.join(self.output_dir, "audios")
@@ -98,4 +97,4 @@ class StockVideo:
 
         logger.info(f"Creating video for stock: {stock.symbol} {stock.period}")
         output_video_file = os.path.join(self.output_dir, "output.mp4")
-        await create_video(image_files, subtitles, video_config, output_video_file)
+        await create_video(image_files, title, subtitles, video_config, output_video_file)

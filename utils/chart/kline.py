@@ -5,13 +5,14 @@ from typing import AsyncGenerator, List, Optional
 
 import pandas as pd
 from pyecharts import options as opts
-from pyecharts.charts import Bar, Grid, Kline
+from pyecharts.charts import Bar, Grid, Kline, Line
 from pyppeteer import launch
 from pyppeteer.browser import Browser
 from tqdm import tqdm
 
 from utils.chart.snapshot import make_snapshot
 from utils.config import config
+from utils.log import logger
 
 
 @asynccontextmanager
@@ -25,7 +26,7 @@ async def managed_browser() -> AsyncGenerator[Browser, None]:
             try:
                 await browser.close()
             except Exception as e:
-                print(f"Error while closing browser: {str(e)}")
+                logger.error(f"Error while closing browser: {str(e)}")
 
 
 async def draw_single_kline(i: int, stock_name: str, df: pd.DataFrame, output_image_folder: str, browser: Browser):
@@ -34,8 +35,76 @@ async def draw_single_kline(i: int, stock_name: str, df: pd.DataFrame, output_im
         kline_data = df[["open", "close", "low", "high"]]
         volume_data = df[["index", "volume", "rise"]]
 
+        bb_lower_data = df["Boll_Lower"].round(2)
+        bb_upper_data = (df["Boll_Upper"] - df["Boll_Lower"]).round(2)
+        bb_middle_data = df["Boll_Mid"].round(2)
+
         current_kline = kline_data.iloc[: i + 1]
         current_volume = volume_data.iloc[: i + 1]
+
+        bb_line = (
+            Line()
+            .add_xaxis(dates)
+            .add_yaxis(
+                series_name="Boll Lower",
+                y_axis=bb_lower_data.tolist(),
+                is_smooth=True,
+                is_symbol_show=False,
+                linestyle_opts=opts.LineStyleOpts(opacity=0),
+                stack="Boll",
+                symbol=None,
+            )
+            .add_yaxis(
+                series_name="Boll Upper",
+                y_axis=bb_upper_data.tolist(),
+                is_smooth=True,
+                is_symbol_show=False,
+                linestyle_opts=opts.LineStyleOpts(opacity=0),
+                areastyle_opts=opts.AreaStyleOpts(color="#ccc", opacity=0.2),
+                stack="Boll",
+                symbol=None,
+            )
+            .add_yaxis(
+                series_name="Boll Middle",
+                y_axis=bb_middle_data.tolist(),
+                is_smooth=True,
+                is_symbol_show=False,
+                linestyle_opts=opts.LineStyleOpts(opacity=0.2),
+                itemstyle_opts=opts.ItemStyleOpts(color="#999"),
+            )
+            .set_global_opts(
+                xaxis_opts=opts.AxisOpts(is_scale=True),
+                yaxis_opts=opts.AxisOpts(
+                    is_scale=True,
+                    splitarea_opts=opts.SplitAreaOpts(is_show=True, areastyle_opts=opts.AreaStyleOpts(opacity=1)),
+                ),
+                title_opts=opts.TitleOpts(
+                    title=f"{stock_name} Boll & Kline",
+                    subtitle=f"{dates[0]}~{dates[-1]}",
+                    pos_top="1%",
+                    pos_left="center",
+                ),
+                visualmap_opts=opts.VisualMapOpts(
+                    is_show=False,
+                    dimension=2,
+                    series_index=5,
+                    is_piecewise=True,
+                    pieces=[
+                        {"value": 1, "color": "rgba(239, 35, 42, 0.2)"},
+                        {"value": -1, "color": "rgba(20, 177, 67, 0.2)"},
+                    ],
+                ),
+                tooltip_opts=opts.TooltipOpts(
+                    trigger="axis",
+                    axis_pointer_type="cross",
+                ),
+                axispointer_opts=opts.AxisPointerOpts(
+                    is_show=True,
+                    link=[{"xAxisIndex": "all"}],
+                ),
+                legend_opts=opts.LegendOpts(is_show=False),
+            )
+        )
 
         kline = (
             Kline()
@@ -61,43 +130,23 @@ async def draw_single_kline(i: int, stock_name: str, df: pd.DataFrame, output_im
                 ),
             )
             .set_global_opts(
-                xaxis_opts=opts.AxisOpts(is_scale=True),
+                xaxis_opts=opts.AxisOpts(
+                    grid_index=0,
+                ),
                 yaxis_opts=opts.AxisOpts(
-                    is_scale=True,
-                    splitarea_opts=opts.SplitAreaOpts(is_show=True, areastyle_opts=opts.AreaStyleOpts(opacity=1)),
+                    grid_index=0,
                 ),
-                title_opts=opts.TitleOpts(
-                    title=f"{stock_name} K-line",
-                    subtitle=f"{dates[0]}~{dates[-1]}",
-                    pos_top="1%",
-                    pos_left="center",
-                ),
-                visualmap_opts=opts.VisualMapOpts(
-                    is_show=False,
-                    dimension=2,
-                    series_index=2,
-                    is_piecewise=True,
-                    pieces=[
-                        {"value": 1, "color": "rgba(239, 35, 42, 0.2)"},
-                        {"value": -1, "color": "rgba(20, 177, 67, 0.2)"},
-                    ],
-                ),
-                tooltip_opts=opts.TooltipOpts(
-                    trigger="axis",
-                    axis_pointer_type="cross",
-                ),
-                axispointer_opts=opts.AxisPointerOpts(
-                    is_show=True,
-                    link=[{"xAxisIndex": "all"}],
-                ),
+                legend_opts=opts.LegendOpts(is_show=False),
             )
         )
+
+        overlap_kline_line = bb_line.overlap(kline)
 
         bar = (
             Bar()
             .add_xaxis(dates)
             .add_yaxis(
-                series_name="",
+                series_name="volume",
                 y_axis=volume_data.values.tolist(),
                 xaxis_index=1,
                 yaxis_index=1,
@@ -106,7 +155,7 @@ async def draw_single_kline(i: int, stock_name: str, df: pd.DataFrame, output_im
                 gap="-100%",
             )
             .add_yaxis(
-                series_name="",
+                series_name="volume",
                 y_axis=current_volume.values.tolist(),
                 xaxis_index=1,
                 yaxis_index=1,
@@ -140,7 +189,7 @@ async def draw_single_kline(i: int, stock_name: str, df: pd.DataFrame, output_im
                 visualmap_opts=opts.VisualMapOpts(
                     is_show=False,
                     dimension=2,
-                    series_index=3,
+                    series_index=6,
                     is_piecewise=True,
                     pieces=[
                         {"value": 1, "color": "#ef232a"},
@@ -158,7 +207,9 @@ async def draw_single_kline(i: int, stock_name: str, df: pd.DataFrame, output_im
                 bg_color="#fff",
             )
         )
-        grid_chart.add(kline, grid_opts=opts.GridOpts(pos_left="10%", pos_top="8%", pos_right="8%", height="50%"))
+        grid_chart.add(
+            overlap_kline_line, grid_opts=opts.GridOpts(pos_left="10%", pos_top="8%", pos_right="8%", height="50%")
+        )
         grid_chart.add(bar, grid_opts=opts.GridOpts(pos_left="10%", pos_top="60%", pos_right="8%", height="16%"))
 
         image_path = os.path.join(output_image_folder, f"kline_{i+1:03d}.png")
@@ -182,7 +233,7 @@ async def draw_kline_chunk(
             if image_path:
                 image_files.append(image_path)
         except Exception as e:
-            print(e)
+            logger.error(e)
     return image_files
 
 
@@ -195,7 +246,7 @@ async def draw_kline(
         chunks[i_worker].append(i)
         i_worker = (i_worker + 1) % workers
 
-    df["index"] = df.index
+    df["index"] = range(len(df))
     df["rise"] = df[["open", "close"]].apply(lambda x: 1 if x.iloc[0] < x.iloc[1] else -1, axis=1)
 
     image_files = []
@@ -206,7 +257,7 @@ async def draw_kline(
 
         for result in all_image_files:
             if isinstance(result, Exception):
-                print(f"Task Error: {result}")
+                logger.error(f"Task Error: {result}")
             else:
                 image_files.extend(result)
 

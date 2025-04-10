@@ -8,7 +8,7 @@
 - 使用TTS（Text-to-Speech）技术生成语音解说
 - 将图片和语音合成视频
 
-https://github.com/user-attachments/assets/b7e5ef8c-d979-4ba4-9b3e-d6a6adadcd1e
+https://github.com/user-attachments/assets/f7a62d4b-7523-47e3-af0f-673026f39924
 
 ## 功能模块
 ### 1. 数据获取与处理
@@ -47,6 +47,9 @@ pip install -r requirements.txt
 
 ### 配置文件
 编辑`config.toml`文件，配置相关参数，例如API密钥、模型名称、输出目录等。
+```bash
+cp config-example.toml config.toml
+```
 
 ### 启动服务
 ```bash

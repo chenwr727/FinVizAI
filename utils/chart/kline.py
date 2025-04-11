@@ -31,6 +31,10 @@ async def managed_browser() -> AsyncGenerator[Browser, None]:
 
 async def draw_single_kline(i: int, stock_name: str, df: pd.DataFrame, output_image_folder: str, browser: Browser):
     try:
+        image_path = os.path.join(output_image_folder, f"kline_{i+1:03d}.png")
+        if os.path.exists(image_path):
+            return image_path
+
         dates = df["date"].tolist()
         kline_data = df[["open", "close", "low", "high"]]
         volume_data = df[["index", "volume", "rise"]]
@@ -212,7 +216,6 @@ async def draw_single_kline(i: int, stock_name: str, df: pd.DataFrame, output_im
         )
         grid_chart.add(bar, grid_opts=opts.GridOpts(pos_left="10%", pos_top="60%", pos_right="8%", height="16%"))
 
-        image_path = os.path.join(output_image_folder, f"kline_{i+1:03d}.png")
         html_path = os.path.join(output_image_folder, f"render_{i+1:03d}.html")
         grid_chart.js_host = config.js.js_host
         await make_snapshot(browser, grid_chart.render(html_path), image_path)

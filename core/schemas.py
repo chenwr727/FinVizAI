@@ -1,3 +1,5 @@
+from typing import List, Optional
+
 from pydantic import BaseModel
 
 
@@ -10,9 +12,16 @@ class StockBase(BaseModel):
     period: str = "daily"
 
 
+class SearchWithText(BaseModel):
+    url: str
+    title: str
+    publish_time: str
+
+
 class LLMResponse(BaseModel):
+    chat_id: str
     status: str
-    search_with_text: str
+    search_with_text: Optional[List[SearchWithText]] = None
     reasoner: str
     text: str
 

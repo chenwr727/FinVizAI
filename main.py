@@ -19,7 +19,7 @@ async def main():
     stock = StockBase(
         name=stock_name, symbol=stock_code, start_date=start_date, end_date=end_date, adjust="qfq", period="daily"
     )
-    await stock_client.generate_video(stock, config.tts, config.video)
+    await stock_client.generate_video(stock, config.tts, config.video, force=True)
 
 
 if __name__ == "__main__":

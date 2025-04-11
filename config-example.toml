@@ -16,9 +16,6 @@ api_key = "sk-e1xxxxxxxxxxxxxxx"
 model = "cosyvoice-v2"
 voices = ["loongbella_v2", "longcheng_v2"]
 
-[tts.edge]
-voices = ["zh-CN-XiaoyiNeural", "zh-CN-YunyangNeural"]
-
 [tts.hailuo]
 api_key = "xxxxxxxxxxxxxxx"
 base_url = "http://127.0.0.1:8080/v1"

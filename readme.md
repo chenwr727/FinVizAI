@@ -8,7 +8,7 @@
 - 使用TTS（Text-to-Speech）技术生成语音解说
 - 将图片和语音合成视频
 
-https://github.com/user-attachments/assets/f7a62d4b-7523-47e3-af0f-673026f39924
+https://github.com/user-attachments/assets/a519c642-b8a1-4cd4-b0ac-f25c6b840e91
 
 ## 功能模块
 ### 1. 数据获取与处理
@@ -35,7 +35,7 @@ https://github.com/user-attachments/assets/f7a62d4b-7523-47e3-af0f-673026f39924
 
 ### 克隆项目
 ```bash
-git clone https://github.com/chenwr727/FinVizAI.git\
+git clone https://github.com/chenwr727/FinVizAI.git
 cd FinVizAI
 ```
 
@@ -66,6 +66,7 @@ python main.py
 │   ├── config.py          # 配置管理
 │   ├── data.py            # 数据处理
 │   ├── log.py             # 日志管理
+│   ├── report.py          # 报告生成
 │   ├── subtitle.py        # 字幕生成
 │   ├── video.py           # 视频生成
 │   └── chart              # 图表相关工具

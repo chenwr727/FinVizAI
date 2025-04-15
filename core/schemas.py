@@ -3,15 +3,6 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 
-class StockBase(BaseModel):
-    name: str
-    symbol: str
-    start_date: str
-    end_date: str
-    adjust: str = ""
-    period: str = "daily"
-
-
 class SearchWithText(BaseModel):
     url: str
     title: str

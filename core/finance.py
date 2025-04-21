@@ -55,7 +55,7 @@ class FinanceVideo:
 
         logger.info(f"Analyzing stock: {self.fetcher.symbol} {self.fetcher.period}")
         report, contents = self.llm.get_analysis(self.fetcher.name, self.fetcher.symbol, df, output_dir)
-        title = ""
+        title = contents.pop(0)
 
         logger.info(f"Generating report image for stock: {self.fetcher.symbol} {self.fetcher.period}")
         report_image_folder = self._create_output_dir(output_dir, "reports")

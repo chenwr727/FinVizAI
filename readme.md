@@ -16,17 +16,17 @@ FinVizAI 是一个集成了多种技术和工具的强大系统，专注于股�
 <table>
     <thead>
         <tr>
-            <th align="center"><g-emoji class="g-emoji" alias="chart_with_upwards_trend">📈</g-emoji> 比亚迪（002594）</th>
-            <th align="center"><g-emoji class="g-emoji" alias="bar_chart">📊</g-emoji> 塑料主连</th>
+            <th align="center"><g-emoji class="g-emoji" alias="chart_with_upwards_trend">📈</g-emoji> 比亚迪（002594） 滑动窗口方式</th>
+            <th align="center"><g-emoji class="g-emoji" alias="bar_chart">📊</g-emoji> 塑料主连 全局背景方式</th>
         </tr>
     </thead>
     <tbody>
         <tr>
             <td align="center">
-                <video controls width="320" height="240" src="https://github.com/user-attachments/assets/46f47854-9054-46c2-90a3-d85900ac974b"></video>
+                <video controls width="320" height="240" src="https://github.com/user-attachments/assets/b4d4ecf8-4a5c-455d-a635-1df0b627ff16"></video>
             </td>
             <td align="center">
-                <video controls width="320" height="240" src="https://github.com/user-attachments/assets/87fd1625-64a6-44d5-8bf2-69ef0be5b3b1"></video>
+                <video controls width="320" height="240" src="https://github.com/user-attachments/assets/abdbfea1-61b9-47f2-beb0-d716cefa805b"></video>
             </td>
         </tr>
     </tbody>
@@ -83,35 +83,43 @@ python main.py
 ## 目录结构 📁
 ```
 .
-├── main.py                # 主程序入口
-├── assets/v5              # 存放前端资源文件
-│   └── echarts.min.js
-├── utils                  # 工具类模块
-│   ├── config.py          # 配置管理
-│   ├── data.py            # 数据处理
-│   ├── log.py             # 日志管理
-│   ├── report.py          # 报告生成
-│   ├── subtitle.py        # 字幕生成
-│   ├── video.py           # 视频生成
-│   └── chart              # 图表相关工具
-│       ├── kline.py       # K线图绘制
-│       └── snapshot.py    # 截图工具
-├── core                   # 核心逻辑模块
-│   ├── fetcher            # 数据获取模块
-│   │   ├── base.py        # 基础 Fetcher 类
-│   │   ├── futures.py     # 期货数据 Fetcher
-│   │   └── stock.py       # 股票数据 Fetcher
-│   ├── llm                # LLM 分析模块
-│   │   ├── base.py        # 基础 LLMClient 类
-│   │   ├── futures.py     # 期货 LLM 分析
-│   │   └── stock.py       # 股票 LLM 分析
-│   ├── schemas.py         # 数据模型定义
-│   ├── stock.py           # 股票视频生成
-│   └── tts                # TTS 相关
-│       ├── base.py        # 基础 TTS 类
-│       ├── dashscope.py   # Dashscope TTS 实现
-│       └── hailuo.py      # Hailuo TTS 实现
-└── output                 # 输出目录
+├── assets/v5                   # 存放前端资源文件
+│   └── echarts.min.js          # Echarts 静态资源文件
+├── core                        # 核心逻辑模块
+│   ├── fetcher                 # 数据获取模块
+│   │   ├── __init__.py         # 初始化文件
+│   │   ├── base.py             # 基础 Fetcher 类
+│   │   ├── futures.py          # 期货数据 Fetcher
+│   │   └── stock.py            # 股票数据 Fetcher
+│   ├── llm                     # LLM 分析模块
+│   │   ├── __init__.py         # 初始化文件
+│   │   ├── base.py             # 基础 LLMClient 类
+│   │   ├── futures.py          # 期货 LLM 分析
+│   │   └── stock.py            # 股票 LLM 分析
+│   ├── tts                     # TTS 相关
+│   │   ├── __init__.py         # 初始化文件
+│   │   ├── base.py             # 基础 TTS 类
+│   │   ├── dashscope.py        # Dashscope TTS 实现
+│   │   └── hailuo.py           # Hailuo TTS 实现
+│   ├── __init__.py             # 初始化文件
+│   ├── futures.py              # 视频生成
+│   └── schemas.py              # 数据模型定义
+├── utils                       # 工具类模块
+│   ├── chart                   # 图表相关工具
+│   │   ├── kline               # K线图相关
+│   │   │   ├── __init__.py     # 初始化文件
+│   │   │   ├── bg.py           # 全局背景
+│   │   │   └── windows.py      # 滑动窗口
+│   │   ├── __init__.py         # 初始化文件
+│   │   ├── draw.py             # K线图绘制
+│   │   └── snapshot.py         # 截图工具
+│   ├── __init__.py             # 初始化文件
+│   ├── config.py               # 配置管理
+│   ├── log.py                  # 日志管理
+│   ├── report.py               # 报告生成
+│   ├── subtitle.py             # 字幕生成
+│   └── video.py                # 视频生成
+└── main.py                     # 主程序入口
 ```
 
 ## 注意事项 ⚠️

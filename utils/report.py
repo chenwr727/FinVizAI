@@ -21,7 +21,7 @@ html, body {{
     padding: 0;
     width: 1080px;
     height: 1920px;
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Microsoft YaHei', sans-serif;
     overflow: hidden;
     position: relative;
 }}
@@ -33,7 +33,7 @@ body::before {{
     height: 100%;
     background: url('data:image/png;base64,{encoded_string}') no-repeat center center;
     background-size: cover;
-    filter: blur({blur}px);
+    filter: opacity({bg_opacity});
     z-index: 0;
 }}
 
@@ -134,15 +134,15 @@ async def generate_report_frames(
     await page.setViewport({"width": 1080, "height": 1920})
 
     output_paths = []
-    for frame in tqdm(range(1, total_frames + 1), desc="Generating frames"):
+    for frame in tqdm(range(total_frames + 1), desc="Generating frames"):
         output_path = os.path.join(output_dir, f"frame_{frame:03}.png")
         if os.path.exists(output_path):
             output_paths.append(output_path)
             continue
 
-        progress = (frame / total_frames) ** 2
+        progress = (frame / total_frames) ** 3
         opacity = round(1.0 - progress, 3)
-        blur = round(8 * (1 - progress), 2)
+        bg_opacity = round(progress, 3)
 
         html = HTML_TEMPLATE.format(
             encoded_string=encoded_string,
@@ -152,7 +152,7 @@ async def generate_report_frames(
             min_h1_font_size=MIN_H1_FONT_SIZE,
             html_content=html_content,
             opacity=opacity,
-            blur=blur,
+            bg_opacity=bg_opacity,
         )
 
         temp_html_path = f"temp_frame_{frame:03}.html"

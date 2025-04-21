@@ -95,7 +95,10 @@ class LLMClient:
         return LLMResponse(**result_dict)
 
     def get_news(self, name: str, symbol: str) -> LLMResponse:
-        messages = [{"role": "user", "content": self.news_prompt.format(name=name, symbol=symbol)}]
+        current_date = datetime.datetime.now().strftime("%Y-%m-%d")
+        messages = [
+            {"role": "user", "content": self.news_prompt.format(name=name, symbol=symbol, current_date=current_date)}
+        ]
         return self.get_response(messages)
 
     def get_trend(self, name: str, symbol: str, df: pd.DataFrame) -> LLMResponse:

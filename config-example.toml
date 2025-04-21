@@ -21,8 +21,11 @@ api_key = "xxxxxxxxxxxxxxx"
 base_url = "http://127.0.0.1:8080/v1"
 voices = ["Podcast_girl", "male-botong"]
 
-[js]
-js_host = "/home/video/assets/v5/"
+[chart]
+js_host = "/home/FinVizAI/assets/v5/"
+workers = 4
+source = "bg"
+windows = 100
 
 [video]
 fps = 24
@@ -30,6 +33,8 @@ background_audio = "./assets/audios/bgm.mp3"
 background_audio_volume = 0.2
 width = 1080
 height = 1920
+codec="libx264"
+threads = 1
 
 [video.subtitle]
 font = "./assets/fonts/msyhbd.ttc"
@@ -45,10 +50,15 @@ interval = 0.2
 [video.title]
 font = "./assets/fonts/msyhbd.ttc"
 width_ratio = 0.8
-font_size_ratio = 12
+font_size_ratio = 13
 position_ratio = 0.5
-color = "#333"
+color = "#2E8B57"
+bg_color = "#FAFAFA"
 stroke_color = "black"
 stroke_width = 0
 text_align = "center"
+interval = 0.5
+bg_image_opacity = 0.5
+
+[video.report]
 interval = 5

@@ -2,12 +2,17 @@ from enum import Enum
 from typing import List, Optional
 
 import toml
-from openai import BaseModel
+from pydantic import BaseModel
 
 
 class TTSSource(str, Enum):
     dashscope = "dashscope"
     hailuo = "hailuo"
+
+
+class ChartSource(str, Enum):
+    bg = "bg"
+    windows = "windows"
 
 
 class LLMConfig(BaseModel):
@@ -38,8 +43,11 @@ class TTSConfig(BaseModel):
     hailuo: Optional[TTSHaiLuoConfig] = None
 
 
-class JsConfig(BaseModel):
+class ChartConfig(BaseModel):
     js_host: str
+    workers: int = 4
+    source: str = "bg"
+    windows: int = 100
 
 
 class SubtitleConfig(BaseModel):
@@ -48,6 +56,7 @@ class SubtitleConfig(BaseModel):
     font_size_ratio: int = 17
     position_ratio: float = 0.88
     color: str = "white"
+    bg_color: Optional[str] = None
     stroke_color: str = "black"
     stroke_width: int = 1
     text_align: str = "center"
@@ -55,7 +64,11 @@ class SubtitleConfig(BaseModel):
 
 
 class TitleConfig(SubtitleConfig):
-    pass
+    bg_image_opacity: float = 0.5
+
+
+class ReportConfig(BaseModel):
+    interval: int = 5
 
 
 class VideoConfig(BaseModel):
@@ -64,14 +77,17 @@ class VideoConfig(BaseModel):
     background_audio_volume: float = 0.2
     width: int
     height: int
+    codec: str = "libx264"
+    threads: int = 1
     subtitle: SubtitleConfig
     title: TitleConfig
+    report: ReportConfig
 
 
 class Config(BaseModel):
     llm: LLMConfig
     tts: TTSConfig
-    js: JsConfig
+    chart: ChartConfig
     video: VideoConfig
 
 

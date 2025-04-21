@@ -78,6 +78,7 @@ async def create_subtitle(
         text,
         font_size=font_size,
         color=subtitle_config.color,
+        bg_color=subtitle_config.bg_color,
         stroke_color=subtitle_config.stroke_color,
         stroke_width=subtitle_config.stroke_width,
         text_align=subtitle_config.text_align,

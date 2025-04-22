@@ -43,11 +43,16 @@ class TTSConfig(BaseModel):
     hailuo: Optional[TTSHaiLuoConfig] = None
 
 
+class ChartWindowsConfig(BaseModel):
+    length: int = 100
+    step: int = 3
+
+
 class ChartConfig(BaseModel):
     js_host: str
     workers: int = 4
-    source: str = "bg"
-    windows: int = 100
+    source: ChartSource = "bg"
+    windows: ChartWindowsConfig
 
 
 class SubtitleConfig(BaseModel):

@@ -25,7 +25,10 @@ voices = ["Podcast_girl", "male-botong"]
 js_host = "/home/FinVizAI/assets/v5/"
 workers = 4
 source = "bg"
-windows = 100
+
+[chart.windows]
+length = 100
+step = 3
 
 [video]
 fps = 24
@@ -33,7 +36,7 @@ background_audio = "./assets/audios/bgm.mp3"
 background_audio_volume = 0.2
 width = 1080
 height = 1920
-codec="libx264"
+codec = "libx264"
 threads = 1
 
 [video.subtitle]

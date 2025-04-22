@@ -11,15 +11,17 @@ from core.schemas import SubtitleBase
 
 class TextToSpeechConverter(ABC):
 
-    def __init__(self, voices: List[str], folder: str):
+    def __init__(self, voices: List[str]):
         self.voices = voices
-        self.folder = folder
+        self.folder = None
 
-    async def text_to_speech(self, contents: List[str], interval: float = 0.2) -> List[SubtitleBase]:
+    async def text_to_speech(
+        self, contents: List[str], output_folder: str, interval: float = 0.2
+    ) -> List[SubtitleBase]:
         duration_start = 0
         subtitles = []
         for i, content in tqdm(enumerate(contents), desc="Text to speech", total=len(contents)):
-            file_name = os.path.join(self.folder, f"{i:02d}.mp3")
+            file_name = os.path.join(output_folder, f"{i:02d}.mp3")
             if not os.path.exists(file_name):
                 await self.process_dialogue(self.voices[0], content, file_name)
 

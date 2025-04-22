@@ -3,27 +3,55 @@ import shutil
 
 from core.fetcher.base import DataFetcher
 from core.llm import FuturesLLMClient, StockLLMClient
-from core.llm.base import LLMClient
-from utils.chart import draw_kline
-from utils.config import TTSConfig, VideoConfig
+from utils.config import ChartSource, Config, TTSSource
 from utils.log import logger
 from utils.report import generate_report_frames
 from utils.video import create_video
 
-SOURCE_DICT = {
-    "stock": StockLLMClient,
-    "futures": FuturesLLMClient,
-}
-
 
 class FinanceVideo:
-    def __init__(self, fetcher: DataFetcher, source: str = "stock", output_dir: str = "output"):
+    def __init__(self, fetcher: DataFetcher, config: Config, source: str = "stock", output_dir: str = "output"):
         self.fetcher = fetcher
+        self.config = config
         self.output_dir = output_dir
 
-        if source not in SOURCE_DICT:
-            raise ValueError(f"Invalid source: {source}")
-        self.llm: LLMClient = SOURCE_DICT[source]()
+        self.drawer = None
+        self.llm = None
+        self.tts = None
+
+        self._preprocess_by_config(source)
+
+    def _preprocess_by_config(self, source: str):
+        if self.config.chart.source == ChartSource.bg:
+            from core.kline.bg import BgKlineDrawer
+
+            drawer = BgKlineDrawer
+        elif self.config.chart.source == ChartSource.windows:
+            from core.kline.windows import WindowsKlineDrawer
+
+            drawer = WindowsKlineDrawer
+        else:
+            raise ValueError(f"Invalid chart source: {self.config.chart.source}")
+        self.drawer = drawer(self.fetcher.name, self.config.video.width, self.config.video.height, self.config.chart)
+
+        if source == "stock":
+            llm_client = StockLLMClient
+        elif source == "futures":
+            llm_client = FuturesLLMClient
+        else:
+            raise ValueError(f"Invalid llm source: {source}")
+        self.llm = llm_client(self.config.llm)
+
+        if self.config.tts.source == TTSSource.dashscope:
+            from core.tts.dashscope import DashscopeTextToSpeechConverter
+
+            self.tts = DashscopeTextToSpeechConverter(self.config.tts.dashscope)
+        elif self.config.tts.source == TTSSource.hailuo:
+            from core.tts.hailuo import HaiLuoTextToSpeechConverter
+
+            self.tts = HaiLuoTextToSpeechConverter(self.config.tts.hailuo)
+        else:
+            raise ValueError(f"Invalid tts source: {self.config.tts.source}")
 
     def _create_output_dir(self, output_dir: str, floder: str):
         output_folder = os.path.join(output_dir, floder)
@@ -35,7 +63,7 @@ class FinanceVideo:
             shutil.rmtree(output_dir)
         os.makedirs(output_dir)
 
-    async def generate_video(self, tts_config: TTSConfig, video_config: VideoConfig, force: bool = False):
+    async def generate_video(self, force: bool = False):
         output_dir = os.path.join(self.output_dir, self.fetcher.symbol, self.fetcher.period)
         if force:
             self._clean_output_dir(output_dir)
@@ -51,7 +79,7 @@ class FinanceVideo:
 
         logger.info(f"Drawing kline for stock: {self.fetcher.symbol} {self.fetcher.period}")
         output_image_folder = self._create_output_dir(output_dir, "images")
-        image_files = await draw_kline(self.fetcher.name, df, output_image_folder)
+        image_files = await self.drawer.draw_kline(df, output_image_folder)
 
         logger.info(f"Analyzing stock: {self.fetcher.symbol} {self.fetcher.period}")
         report, contents = self.llm.get_analysis(self.fetcher.name, self.fetcher.symbol, df, output_dir)
@@ -63,29 +91,9 @@ class FinanceVideo:
 
         logger.info(f"Generating audio for stock: {self.fetcher.symbol} {self.fetcher.period}")
         output_audio_folder = self._create_output_dir(output_dir, "audios")
-        if tts_config.source == "dashscope":
-            from core.tts.dashscope import DashscopeTextToSpeechConverter
-
-            converter = DashscopeTextToSpeechConverter(
-                tts_config.dashscope.api_key,
-                tts_config.dashscope.model,
-                tts_config.dashscope.voices,
-                output_audio_folder,
-            )
-        elif tts_config.source == "hailuo":
-            from core.tts.hailuo import HaiLuoTextToSpeechConverter
-
-            converter = HaiLuoTextToSpeechConverter(
-                tts_config.hailuo.api_key,
-                tts_config.hailuo.base_url,
-                tts_config.hailuo.voices,
-                output_audio_folder,
-            )
-        else:
-            raise ValueError(f"Invalid tts source: {tts_config.source}")
-        subtitles = await converter.text_to_speech(contents)
+        subtitles = await self.tts.text_to_speech(contents, output_audio_folder)
 
         logger.info(f"Creating video for stock: {self.fetcher.symbol} {self.fetcher.period}")
-        await create_video(report_frames, image_files, title, subtitles, video_config, output_video_file)
+        await create_video(report_frames, image_files, title, subtitles, self.config.video, output_video_file)
 
         logger.info(f"Video created: {output_video_file}")

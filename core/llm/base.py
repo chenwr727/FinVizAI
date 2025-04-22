@@ -10,7 +10,7 @@ import pandas as pd
 from openai import OpenAI
 
 from core.schemas import LLMResponse
-from utils.config import config
+from utils.config import LLMConfig
 from utils.log import logger
 
 
@@ -19,24 +19,15 @@ class LLMClient:
     trend_prompt = ""
     copywriter_prompt = ""
 
-    def __init__(
-        self,
-        base_url: str = config.llm.base_url,
-        api_key: str = config.llm.api_key,
-        model: str = config.llm.model,
-        hy_user: str = config.llm.hy_user,
-        agent_id: str = config.llm.agent_id,
-        chat_id: str = config.llm.chat_id,
-        should_remove_conversation: bool = config.llm.should_remove_conversation,
-    ):
-        self.client = OpenAI(base_url=base_url, api_key=api_key)
-        self.model = model
+    def __init__(self, config: LLMConfig):
+        self.client = OpenAI(base_url=config.base_url, api_key=config.api_key)
+        self.model = config.model
         self.extra_body = {
             "hy_source": "web",
-            "hy_user": hy_user,
-            "agent_id": agent_id,
-            "chat_id": chat_id,
-            "should_remove_conversation": should_remove_conversation,
+            "hy_user": config.hy_user,
+            "agent_id": config.agent_id,
+            "chat_id": config.chat_id,
+            "should_remove_conversation": config.should_remove_conversation,
         }
         self.should_sleep = False
 

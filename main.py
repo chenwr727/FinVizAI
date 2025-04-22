@@ -15,8 +15,8 @@ async def main():
         name=name, symbol=symbol, start_date=start_date, end_date=end_date, period="daily", adjust="qfq"
     )
 
-    stock_client = FinanceVideo(fetcher_client, "stock")
-    await stock_client.generate_video(config.tts, config.video, force=False)
+    stock_client = FinanceVideo(fetcher_client, config, "stock")
+    await stock_client.generate_video(force=False)
 
     name = "塑料主连"
     symbol = "塑料主连"
@@ -26,8 +26,8 @@ async def main():
         name=name, symbol=symbol, start_date=start_date, end_date=end_date, period="daily"
     )
 
-    stock_client = FinanceVideo(fetcher_client, "futures")
-    await stock_client.generate_video(config.tts, config.video, force=False)
+    stock_client = FinanceVideo(fetcher_client, config, "futures")
+    await stock_client.generate_video(force=False)
 
 
 if __name__ == "__main__":
